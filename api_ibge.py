@@ -118,3 +118,26 @@ def obter_tudo():
     populacao = tratar_populacao(buscar_populacao(), buscar_municipio())
     pib = calcular_pib_per_capita(tratar_pib(buscar_pib()), populacao)
     return populacao, pib
+if __name__ == "__main__":
+
+    print("Buscando dados do IBGE para Jundiaí...")
+
+    populacao, pib = obter_tudo()
+
+    print("Exportando arquivos CSV...")
+
+    populacao.to_csv(
+        "populacao_jundiai.csv",
+        index=False,
+        encoding="utf-8-sig",
+        sep=";"
+    )
+
+    pib.to_csv(
+        "pib_jundiai.csv",
+        index=False,
+        encoding="utf-8-sig",
+        sep=";"
+    )
+
+    print("\nArquivos gerados com sucesso!")

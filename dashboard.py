@@ -2,6 +2,8 @@
 dashboard.py - Dashboard Streamlit: crescimento de Jundiaí (SP).
 Rodar com:  streamlit run dashboard.py
 """
+from pathlib import Path
+
 import pandas as pd
 import plotly.express as px
 import streamlit as st
@@ -26,10 +28,28 @@ h2, h3 { color: #1d4ed8; }
 </style>
 """, unsafe_allow_html=True)
 
-@st.cache_data(ttl=24 * 3600, show_spinner="Consultando a API do IBGE...")
+PASTA = Path(__file__).resolve().parent
+CSV_POPULACAO = PASTA / "populacao_jundiai.csv"
+CSV_PIB = PASTA / "pib_jundiai.csv"
+
+
+def ler_csv(caminho):
+    return pd.read_csv(caminho, sep=";", encoding="utf-8-sig")
+
+
+@st.cache_data(ttl=24 * 3600, show_spinner="Carregando dados...")
 def carregar():
-    """Consulta a API do IBGE direto (sem arquivo local) e entrega para os gráficos."""
-    return api_ibge.obter_tudo()
+    """Tenta ler os CSVs locais primeiro; se faltarem ou estiverem invalidos, busca direto na API do IBGE."""
+    try:
+        populacao, pib = ler_csv(CSV_POPULACAO), ler_csv(CSV_PIB)
+        if populacao.empty or pib.empty:
+            raise ValueError("CSV vazio")
+        if not {"ano", "fonte", "populacao"} <= set(populacao.columns) or not {"ano", "categoria", "valor"} <= set(pib.columns):
+            raise ValueError("CSV com colunas inesperadas")
+        return populacao, pib, "CSV locais"
+    except (OSError, ValueError, pd.errors.ParserError):
+        populacao, pib = api_ibge.obter_tudo()
+        return populacao, pib, "API do IBGE"
 
 
 def br(numero, casas=0):
@@ -60,7 +80,7 @@ def grafico_area(df, y, cor, ylabel, fmt=",.0f", altura=360, sufixo=""):
     mostrar(fig, ylabel, fmt, altura, sufixo)
 
 
-pop, pib = carregar()
+pop, pib, origem_dados = carregar()
 ficha = pop.iloc[0]
 
 st.sidebar.header("Filtros")
@@ -79,6 +99,7 @@ if len(d) < 2:
 st.title("Crescimento de Jundiaí (SP)")
 st.markdown("Como a população e a economia de Jundiaí evoluíram ao longo do tempo. "
             "Dados: API do IBGE (Localidades e Agregados/SIDRA).")
+st.sidebar.caption(f"Fonte dos dados carregados: {origem_dados}")
 st.caption(f"Município: Jundiaí ({ficha['uf']})  |  Região geográfica: {ficha['regiao_geografica']}  |  "
            f"Mesorregião: {ficha['mesorregiao']}  |  Microrregião: {ficha['microrregiao']}  |  "
            f"Região imediata: {ficha['regiao_imediata']}  |  Região intermediária: {ficha['regiao_intermediaria']}")

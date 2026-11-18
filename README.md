@@ -24,7 +24,6 @@ dashboard-crescimento-jundiai/
 ├── populacao_jundiai.csv # dados de população (gerado)
 ├── pib_jundiai.csv       # dados de PIB e setores (gerado)
 ├── requirements.txt      # dependências
-└── imagens/              # capturas de tela usadas neste README
 ```
 
 ## Pré-requisitos

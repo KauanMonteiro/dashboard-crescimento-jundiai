@@ -107,3 +107,12 @@ Serão criados `populacao_jundiai.csv` e `pib_jundiai.csv`.
 ```bash
 streamlit run dashboard.py
 ```
+### 7. Link da apresentação do projeto
+
+Confira a apresentação do projeto **Crescimento de Jundiaí**, 
+que aborda o crescimento populacional e econômico do município.
+
+[![Apresentação do Projeto](https://img.youtube.com/vi/Xg0Ztb-Zr6Q/0.jpg)](https://youtu.be/Xg0Ztb-Zr6Q)
+
+[▶ Assistir à apresentação no YouTube](https://youtu.be/Xg0Ztb-Zr6Q)
+
